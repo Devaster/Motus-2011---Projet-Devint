@@ -21,13 +21,15 @@ public class JeuDuels extends Jeu implements JeuInteractivite {
 	private HorlogeInteractive horloge;
 	private Timer timer;
 	private int currentPlayer;
+	private int numPlayer;
 	
 	public JeuDuels(int longueur, int nbMots, int nbEssais) {
 		super(longueur,nbMots,nbEssais);
 		liste = new EventListenerList();
 		horloge = new HorlogeInteractive();
 		timer = new Timer();
-		currentPlayer = 1;
+		currentPlayer = 0;
+		numPlayer = 1;
 	}
 	
 	public boolean endGame() {
@@ -42,19 +44,20 @@ public class JeuDuels extends Jeu implements JeuInteractivite {
 	public boolean cantProposeAgain() {
 		boolean b = super.cantProposeAgain();
 		if(b) {
-			if(currentPlayer==2) {
+			if(numPlayer==2) {
 				fireGameAnswerListener(new GameAnswerEvent(this,AnswerType.NO_MORE_TRY,currentWord(),currentDef()));
 				nextWord();
-				currentPlayer=1;
+				numPlayer=1;
 				firePlayerChangedListener(Long.MAX_VALUE,true);
 			}
 			else {
-				currentPlayer++;
+				numPlayer++;
 				reset();
 				firePlayerChangedListener(0,true);
 			}
 					
 		}
+		
 		
 		return b;
 	}
@@ -64,7 +67,7 @@ public class JeuDuels extends Jeu implements JeuInteractivite {
 		if(b) {
 			fireGameAnswerListener(new GameAnswerEvent(this,AnswerType.WORD_FOUND,currentWord(),currentDef()));
 			nextWord();
-			currentPlayer = 1;
+			numPlayer = 1;
 			if(!endGame()) firePlayerChangedListener(Long.MAX_VALUE,true);
 		}
 		
@@ -111,14 +114,14 @@ public class JeuDuels extends Jeu implements JeuInteractivite {
 	@Override
 	public void changeOfWord() {
 		
-		if(currentPlayer==2) {
+		if(numPlayer==2) {
 			fireGameAnswerListener(new GameAnswerEvent(this,AnswerType.NO_MORE_TRY,currentWord(),currentDef()));
 			nextWord();
-			currentPlayer = 1;
+			numPlayer = 1;
 			if(!endGame()) firePlayerChangedListener(Long.MAX_VALUE,true);
 		}
 		else {
-			currentPlayer++;
+			numPlayer++;
 			reset();
 			firePlayerChangedListener(0,true);
 		}
@@ -186,7 +189,9 @@ public class JeuDuels extends Jeu implements JeuInteractivite {
 	}
 	
 	public void firePlayerChangedListener(long delay, boolean b) {
-		for(PlayerChangedListener listener : liste.getListeners(PlayerChangedListener.class)) listener.signalChangement(new PlayerChangedEvent(this,currentPlayer,delay,b));
+		currentPlayer++;
+		currentPlayer%=2;
+		for(PlayerChangedListener listener : liste.getListeners(PlayerChangedListener.class)) listener.signalChangement(new PlayerChangedEvent(this,currentPlayer+1,delay,b));
 	}
 	
 	public void addScoreChangedListener(ScoreChangedListener listener) {
