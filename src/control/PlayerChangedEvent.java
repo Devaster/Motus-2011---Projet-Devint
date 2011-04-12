@@ -7,13 +7,11 @@ public class PlayerChangedEvent extends EventObject {
 
 	private int numPlayer;
 	private long delay;
-	private boolean reset;
 
-	public PlayerChangedEvent(Object source, int n, long delay,boolean b) {
+	public PlayerChangedEvent(Object source, int n, long delay) {
 		super(source);
 		numPlayer = n;
 		this.delay = delay;
-		reset = b;
 	}
 	
 	public int getNumPlayer() {
@@ -22,10 +20,6 @@ public class PlayerChangedEvent extends EventObject {
 	
 	public long getDelay() {
 		return delay;
-	}
-	
-	public boolean needToReset() {
-		return reset;
 	}
 	
 }

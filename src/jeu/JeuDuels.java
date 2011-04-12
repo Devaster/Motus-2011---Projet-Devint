@@ -32,6 +32,10 @@ public class JeuDuels extends Jeu implements JeuInteractivite {
 		numPlayer = 1;
 	}
 	
+	public int getCurrentPlayer() {
+		return currentPlayer+1;
+	}
+	
 	public boolean endGame() {
 		boolean b = super.endGame();
 		if(b) {
@@ -48,12 +52,12 @@ public class JeuDuels extends Jeu implements JeuInteractivite {
 				fireGameAnswerListener(new GameAnswerEvent(this,AnswerType.NO_MORE_TRY,currentWord(),currentDef()));
 				nextWord();
 				numPlayer=1;
-				firePlayerChangedListener(Long.MAX_VALUE,true);
+				firePlayerChangedListener(Long.MAX_VALUE);
 			}
 			else {
 				numPlayer++;
 				reset();
-				firePlayerChangedListener(0,true);
+				firePlayerChangedListener(0);
 			}
 					
 		}
@@ -68,7 +72,7 @@ public class JeuDuels extends Jeu implements JeuInteractivite {
 			fireGameAnswerListener(new GameAnswerEvent(this,AnswerType.WORD_FOUND,currentWord(),currentDef()));
 			nextWord();
 			numPlayer = 1;
-			if(!endGame()) firePlayerChangedListener(Long.MAX_VALUE,true);
+			if(!endGame()) firePlayerChangedListener(Long.MAX_VALUE);
 		}
 		
 		return b;
@@ -118,12 +122,12 @@ public class JeuDuels extends Jeu implements JeuInteractivite {
 			fireGameAnswerListener(new GameAnswerEvent(this,AnswerType.NO_MORE_TRY,currentWord(),currentDef()));
 			nextWord();
 			numPlayer = 1;
-			if(!endGame()) firePlayerChangedListener(Long.MAX_VALUE,true);
+			if(!endGame()) firePlayerChangedListener(Long.MAX_VALUE);
 		}
 		else {
 			numPlayer++;
 			reset();
-			firePlayerChangedListener(0,true);
+			firePlayerChangedListener(0);
 		}
 		
 	}
@@ -188,10 +192,10 @@ public class JeuDuels extends Jeu implements JeuInteractivite {
 		liste.remove(PlayerChangedListener.class, listener);
 	}
 	
-	public void firePlayerChangedListener(long delay, boolean b) {
+	public void firePlayerChangedListener(long delay) {
 		currentPlayer++;
 		currentPlayer%=2;
-		for(PlayerChangedListener listener : liste.getListeners(PlayerChangedListener.class)) listener.signalChangement(new PlayerChangedEvent(this,currentPlayer+1,delay,b));
+		for(PlayerChangedListener listener : liste.getListeners(PlayerChangedListener.class)) listener.signalChangement(new PlayerChangedEvent(this,currentPlayer+1,delay));
 	}
 	
 	public void addScoreChangedListener(ScoreChangedListener listener) {

@@ -68,8 +68,8 @@ public class Controleur {
 		menu.sing();
 	}
 	
-	public void askPlayer() {
-		((JeuDuels) jeu).firePlayerChangedListener(0,false);
+	public int askPlayer() {
+		return ((JeuDuels) jeu).getCurrentPlayer();
 	}
 
 }

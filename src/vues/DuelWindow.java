@@ -21,7 +21,7 @@ public class DuelWindow extends GameWindow implements PlayerChangedListener {
 		inputWordArea.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
 				
-				if(e.getKeyCode()==KeyEvent.VK_F3) ctrl.askPlayer();
+				if(e.getKeyCode()==KeyEvent.VK_F3) signalChangement(ctrl.askPlayer(),0);
 				
 			}
 		});
@@ -30,7 +30,7 @@ public class DuelWindow extends GameWindow implements PlayerChangedListener {
 	
 	@Override
 	public void signalChangement(PlayerChangedEvent e) {
-		if(e.needToReset()) reset();
+		reset();
 		signalChangement(e.getNumPlayer(),Math.min(e.getDelay(), TIME_DEF));
 	}
 	
