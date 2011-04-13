@@ -13,7 +13,7 @@ public class DuelWindow extends GameWindow implements PlayerChangedListener {
 	public DuelWindow(int nbLignes, int nbColonnes, Controleur controleur) {
 		super(nbLignes,nbColonnes,controleur);
 		implementNewListeners();
-		signalChangement(1,11000);
+		signalChangement(1,7000);
 	}
 	
 	private void implementNewListeners() {

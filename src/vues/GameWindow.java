@@ -73,7 +73,7 @@ public class GameWindow extends JFrame implements GameAnswerListener, TimeChange
 		
 		setVisible(true);
 		
-		voix.playText("La partie va commencer ! Entrez des mots de taille "+nbColonnes+". Vous avez droit à "+nbLignes+" essais par mot. "+touches);
+		voix.playText("La partie va commencer ! Entrez des mots de taille "+nbColonnes+". Vous avez droit à "+nbLignes+" essais par mot. "+"Appuyez sur èffe un pour plus d'informations.");
 		
 	}
 
@@ -117,7 +117,10 @@ public class GameWindow extends JFrame implements GameAnswerListener, TimeChange
 		for(int j = 0; j < nbColonnes; j++) lastProposal += "_";
 		
 		for(int k = 0; k < nbLignes; k++) {
-			for(int i = 0; i < nbColonnes; i++) answers.get(k).get(i).setText(null);
+			for(int i = 0; i < nbColonnes; i++) {
+				answers.get(k).get(i).setText("_");
+				answers.get(k).get(i).setForeground(Color.BLACK); //couleur discutable
+			}
 		}
 		
 		currentLine=0;
@@ -138,7 +141,7 @@ public class GameWindow extends JFrame implements GameAnswerListener, TimeChange
 	    	aux = new JPanel();
 	    	aux.setAlignmentX(RIGHT_ALIGNMENT);
 	    	for(int j = 0; j < nbColonnes; j++) {
-	    		lettre = new JLabel();
+	    		lettre = new JLabel("_");
 	    		lettre.setAlignmentX(CENTER_ALIGNMENT);
 	    		lettre.setPreferredSize(new Dimension(fontOutput.getSize(),fontOutput.getSize()));
 				lettre.setForeground(Color.BLACK);
@@ -259,7 +262,7 @@ public class GameWindow extends JFrame implements GameAnswerListener, TimeChange
 			if(answers.get(currentLine).get(i).getForeground()==MISPLACED) rep += " La lettreu "+goodPrononciation(answers.get(currentLine).get(i).getText().charAt(0))+" n'est pas à sa place.";
 			if(answers.get(currentLine).get(i).getForeground()==GOOD||answers.get(currentLine).get(i).getForeground()==GIVEN) rep += " La lettreu "+goodPrononciation(answers.get(currentLine).get(i).getText().charAt(0))+" est bien placée.";
 		}
-		voix.playText(rep+" Pour réentendre tappez èfe 2.");
+		voix.playText(rep+" Il vous reste "+(answers.size()-currentLine-1)+" essais. Pour réentendre tappez èfe 2.");
 	}
 	
 	private String goodPrononciation(char c) {
