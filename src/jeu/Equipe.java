@@ -5,12 +5,13 @@ import java.util.List;
 
 public class Equipe  {
 
-
-	List<Joueur> membres;
+	List<Joueur> joueurs;
 	
 	public Equipe(List<Joueur> joueurs) {
-		membres = joueurs;
+		this.joueurs = joueurs;
 	}
 	
-	
+	public List<Joueur> getPlayers() {
+		return joueurs;
+	}
 }

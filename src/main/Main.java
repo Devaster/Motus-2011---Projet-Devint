@@ -2,7 +2,6 @@ package main;
 
 import static hsqldb.DataBase.*;
 import java.sql.Connection;
-import dictionnaires.Dictionary;
 import hsqldb.DataBase;
 
 /**
@@ -25,14 +24,19 @@ public class Main {
 	public static void main(String[] args) {
 		myDB = new DataBase();
 		conn = createConnection();
-		dropWordsTable(conn);
-		createWordsTable(conn);
-		String dictxt = "/home/julien/workspace/Motus2011/ressources/dictionary.txt";
-		Dictionary dic = new Dictionary(dictxt);
-		System.out.println(dic);
-		addAllWordsToDB(conn, dic);
-		Dictionary dic2 = retrieveWordsFromBD(conn);
-		System.out.print(dic2);
+		createPlayersTable(conn);
+		createScoresTable(conn);
+		//dropWordsTable(conn);
+		//createWordsTable(conn);
+		//Dictionary dic = new Dictionary("./ressources/dictionary.txt");
+		//addAllWordsToDB(conn, dic);
+		//Dictionary dic2 = retrieveWordsFromBD(conn);
+		//System.out.println(dic2);
+		//removeAllWordsFromDB(conn);
+		//Word w = new Word(30000, "essai", "test micro", "test db");
+		//addWordToDB(conn, w);
+		//changeWordTheme(conn, w.getWordName(), "new theme");
+		//removeWordFromDB(conn, "essai");
 		disconnect(conn);
 	}
 }

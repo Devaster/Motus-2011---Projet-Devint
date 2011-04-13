@@ -10,6 +10,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
+
+import score.Score;
+
+import jeu.Equipe;
+import jeu.Joueur;
 import dictionnaires.Dictionary;
 import dictionnaires.Word;
 
@@ -180,6 +185,70 @@ public class DataBase {
 	}
 
 	/**
+	 * Create table players if not exists
+	 * 
+	 * @param conn
+	 * @return boolean
+	 */
+	public static boolean createPlayersTable(Connection conn) {
+		Statement stat = getStatement(conn);
+		String query = "CREATE TABLE IF NOT EXISTS players (id INT NOT NULL,"
+				+ " name VARCHAR(64) NOT NULL, age INT NULL,"
+				+ " scoreId INT NOT NULL, PRIMARY KEY( id ));";
+		boolean status = false;
+		try {
+			if (stat.executeUpdate(query) == 0) {
+				status = true;
+				System.out.println("Table \'players\' created.");
+			}
+		} catch (SQLException ex) {
+			System.err.println("==> SQLException: ");
+			while (ex != null) {
+				System.err.println("Message:" + ex.getMessage());
+				System.err.println("SQLState: " + ex.getSQLState());
+				System.err.println("ErrorCode: " + ex.getErrorCode());
+				ex = ex.getNextException();
+				System.err.println("");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return status;
+	}
+
+	/**
+	 * Create table scores if not exists
+	 * 
+	 * @param conn
+	 * @return boolean
+	 */
+	public static boolean createScoresTable(Connection conn) {
+		Statement stat = getStatement(conn);
+		String query = "CREATE TABLE IF NOT EXISTS scores (id INT NOT NULL,"
+				+ " ranking INT NULL, finalScore INT NULL, wordsFound INT NULL,"
+				+ " gameTime INT NULL, PRIMARY KEY( id ));";
+		boolean status = false;
+		try {
+			if (stat.executeUpdate(query) == 0) {
+				status = true;
+				System.out.println("Table \'scores\' created.");
+			}
+		} catch (SQLException ex) {
+			System.err.println("==> SQLException: ");
+			while (ex != null) {
+				System.err.println("Message:" + ex.getMessage());
+				System.err.println("SQLState: " + ex.getSQLState());
+				System.err.println("ErrorCode: " + ex.getErrorCode());
+				ex = ex.getNextException();
+				System.err.println("");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return status;
+	}
+
+	/**
 	 * Fill the words table in the DB from a dictionary loaded in the RAM
 	 * 
 	 * @param conn
@@ -188,7 +257,6 @@ public class DataBase {
 	 */
 	public static boolean addAllWordsToDB(Connection conn, Dictionary dic) {
 		SortedSet<Word> words = dic.getAllWords();
-		boolean status = false;
 		int cnt = 0;
 		Iterator<Word> it = words.iterator();
 		Word word;
@@ -197,16 +265,14 @@ public class DataBase {
 			if (addWordToDB(conn, word))
 				System.out.println(++cnt);
 		}
-		if (cnt == words.size())
-			status = true;
-		return status;
+		return cnt == words.size();
 	}
 
 	/**
 	 * Introduction of a new word in the DB
 	 * 
 	 * @param conn
-	 *            , word
+	 * @param word
 	 * @return status
 	 */
 	public static boolean addWordToDB(Connection conn, Word word) {
@@ -221,6 +287,130 @@ public class DataBase {
 		try {
 			if (stat.executeUpdate(query) != 0)
 				status = true;
+		} catch (SQLException ex) {
+			System.err.println("==> SQLException: ");
+			while (ex != null) {
+				System.err.println("Message:" + ex.getMessage());
+				System.err.println("SQLState: " + ex.getSQLState());
+				System.err.println("ErrorCode: " + ex.getErrorCode());
+				ex = ex.getNextException();
+				System.err.println("");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return status;
+	}
+
+	/**
+	 * Add a player record in the DB
+	 * 
+	 * @param conn
+	 * @param word
+	 * @return status
+	 */
+	public static boolean addPlayerToDB(Connection conn, Joueur player) {
+		int id = player.getPlayerId();
+		String name = player.getPlayerName().replace('\'', ' ');
+		int age = player.getPlayerAge();
+		int scoreId = player.getPlayerScore().getScoreId();
+		String query = "INSERT INTO words (id, name, age, scoreId) VALUES ("
+				+ id + ",'" + name + "', " + age + ", " + scoreId + ");";
+		Statement stat = getStatement(conn);
+		boolean status = false;
+		try {
+			if (stat.executeUpdate(query) != 0)
+				status = true;
+		} catch (SQLException ex) {
+			System.err.println("==> SQLException: ");
+			while (ex != null) {
+				System.err.println("Message:" + ex.getMessage());
+				System.err.println("SQLState: " + ex.getSQLState());
+				System.err.println("ErrorCode: " + ex.getErrorCode());
+				ex = ex.getNextException();
+				System.err.println("");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return status;
+	}
+
+	/**
+	 * Add all the players of a given team in the DB
+	 * 
+	 * @param conn
+	 * @param team
+	 * @return boolean
+	 */
+	public static boolean addTeamToDB(Connection conn, Equipe team) {
+		int cnt = 0;
+		for (Joueur player : team.getPlayers())
+			if (addPlayerToDB(conn, player))
+				cnt++;
+		return cnt == team.getPlayers().size();
+	}
+
+	/**
+	 * Add a score record in the DB
+	 * 
+	 * @param conn
+	 * @param word
+	 * @return status
+	 */
+	public static boolean addScoreToDB(Connection conn, Score score) {
+		int id = score.getScoreId();
+		int ranking = score.getRanking();
+		int finalScore = score.getFinalScore();
+		int wordsFound = score.getWordsFound();
+		int gameTime = score.getGameTime();
+		String query = "INSERT INTO scores (id, ranking, finalScore, wordsFound, gameTime) VALUES ("
+				+ id
+				+ ","
+				+ ranking
+				+ ", "
+				+ finalScore
+				+ ", "
+				+ wordsFound
+				+ ", " + gameTime + ");";
+		Statement stat = getStatement(conn);
+		boolean status = false;
+		try {
+			if (stat.executeUpdate(query) != 0)
+				status = true;
+		} catch (SQLException ex) {
+			System.err.println("==> SQLException: ");
+			while (ex != null) {
+				System.err.println("Message:" + ex.getMessage());
+				System.err.println("SQLState: " + ex.getSQLState());
+				System.err.println("ErrorCode: " + ex.getErrorCode());
+				ex = ex.getNextException();
+				System.err.println("");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return status;
+	}
+
+	/**
+	 * Update the score of a given player in the DB
+	 * 
+	 * @param conn
+	 * @param newScore
+	 * @param player
+	 * @return int
+	 */
+	public int updateScore(Connection conn, Score newScore, Joueur player) {
+		String query = "UPDATE scores SET ranking = " + newScore.getRanking()
+				+ ", finalScore = " + newScore.getFinalScore()
+				+ ", worsFound = " + newScore.getWordsFound() + ", gameTime = "
+				+ newScore.getGameTime() + " WHERE id = "
+				+ player.getPlayerId() + ";";
+		Statement stat = getStatement(conn);
+		int status = 0;
+		try {
+			status = stat.executeUpdate(query);
 		} catch (SQLException ex) {
 			System.err.println("==> SQLException: ");
 			while (ex != null) {
@@ -298,7 +488,7 @@ public class DataBase {
 	 * Remove a single word in the table
 	 * 
 	 * @param conn
-	 *            , wordName
+	 * @param wordName
 	 * @return status
 	 */
 	public static boolean removeWordFromDB(Connection conn, String wordName) {
@@ -327,7 +517,6 @@ public class DataBase {
 	 * Get all the words from the DB
 	 * 
 	 * @param conn
-	 * 
 	 * @return words
 	 */
 	public static Dictionary retrieveWordsFromBD(Connection conn) {
@@ -361,8 +550,7 @@ public class DataBase {
 	 * Get all the words of the theme given
 	 * 
 	 * @param conn
-	 *            , theme
-	 * 
+	 * @param theme
 	 * @return words
 	 */
 	public static List<Word> retrieveWordsByThemeFromBD(Connection conn,
@@ -395,8 +583,8 @@ public class DataBase {
 	 * Change a word's definition
 	 * 
 	 * @param conn
-	 *            , wordName, newDef
-	 * 
+	 * @param wordName
+	 * @param newDef
 	 * @return status
 	 */
 	public static int changeWordDef(Connection conn, String wordName,
@@ -427,8 +615,8 @@ public class DataBase {
 	 * Change a word's theme
 	 * 
 	 * @param conn
-	 *            , wordName, newTheme
-	 * 
+	 * @param wordName
+	 * @param newTheme
 	 * @return status
 	 */
 	public static int changeWordTheme(Connection conn, String wordName,

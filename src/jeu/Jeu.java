@@ -8,95 +8,69 @@ import dictionnaires.Word;
 
 public class Jeu {
 
-	private int longueur;
-	private int nbEssais;
+	private int longueur; // longueur des mots
+	@SuppressWarnings("unused")
+	private int nbMotsPartie; // nombre de mots au cours de la partie
+	private int nbEssais; // nombre d'essais permis par mot
 	private int nbTentatives;
-	private LinkedList<Word> mots;
 	private Random random;
-	
-	protected int[] results;
-	
+	private LinkedList<Word> mots;
+	private String lastProposal;
+
 	public Jeu(int longueur, int nbMots, int nbEssais) {
 		this.longueur = longueur;
+		this.nbMotsPartie = nbMots;
 		this.nbEssais = nbEssais;
-		
-		nbTentatives = 0;
-		results = new int[longueur];
-		mots = new LinkedList<Word>();
 		random = new Random();
-		
-		Dictionary dico = new Dictionary("../ressources/DicFra.txt");
+		lastProposal = null;
+		nbTentatives = 0;
+		Dictionary dico = new Dictionary("../ressources/dictionary.txt");
 		Word aux;
-		
-		for(int i = 0; i < longueur; i++) results[i] = 0;
-		
-		for(int j = 0; j < nbMots; j++) {
-			
+		mots = new LinkedList<Word>();
+		for (int i = 0; i < nbMots; i++) {
 			do {
-				aux = dico.pickUpWord();
-			} while(!((aux.getWordName().length()==longueur)&&(aux.getWordName().matches("[^-]*"))));
-			
+				aux = dico.pickOutWord();
+			} while (aux.getWordName().length() != longueur);
 			mots.add(aux);
 		}
-		
 	}
-	
+
+	public boolean hasFound(String proposal) {
+		nbTentatives++;
+		boolean b = proposal.equals(mots.getFirst().getWordName());
+		if (b) {
+			lastProposal = null;
+			mots.removeFirst();
+		} else
+			lastProposal = proposal;
+		return b;
+	}
+
+	public String currentWord() {
+		return mots.getFirst().getWordName();
+	}
+
+	public String getLastProposal() {
+		return lastProposal;
+	}
+
+	public int randomLetter() {
+		int n = random.nextInt(longueur);
+		if ((lastProposal == null)
+				|| (lastProposal.charAt(n) != mots.getFirst().getWordName()
+						.charAt(n)))
+			return n;
+		else
+			return randomLetter();
+
+	}
+
+	public boolean NoMoreTry() {
+		return nbTentatives == nbEssais;
+	}
+
 	public boolean endGame() {
 		return mots.isEmpty();
 	}
-	
-	public boolean cantProposeAgain() {
-		return (nbTentatives==nbEssais);
-	}
-	
-	public boolean compare(String proposal) {
-		nbTentatives++;
-		String currentWord = currentWord();
-		for(int i = 0; i < longueur; i++) {
-			if(proposal.charAt(i)==currentWord.charAt(i)) results[i] = 1;
-			else {
-				if(currentWord.contains(""+proposal.charAt(i))) results[i] = -1;
-				else results[i] = 0;
-			}
-		}
-		return proposal.equals(currentWord());
-	}
-	
-	public boolean hasFound() {
-		for(int i = 0; i < results.length; i++) {
-			if(results[i]!=1) return false;
-		}
-		return true;
-	}
-	
-	protected String currentWord() {
-		return mots.getFirst().getWordName();
-	}
-	
-	protected String currentDef() {
-		return mots.getFirst().getWordDefinition();
-	}
-	
-	public void nextWord() {
-		reset();
-		mots.removeFirst();
-	}
-	
-	protected void reset() {
-		nbTentatives = 0;
-		for(int i = 0; i < longueur; i++) results[i] = 0;
-	}
-	
-	public int giveBonus() {
-		int n = randomLetter();
-		results[n] = 1;
-		nbTentatives++;
-		return 256*n+currentWord().charAt(n);
-	}
 
-	private int randomLetter() {
-		int n = random.nextInt(longueur);
-		return (results[n]==1) ? randomLetter() : n;
-	}
-	
 }
